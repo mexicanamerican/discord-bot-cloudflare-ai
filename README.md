@@ -1,27 +1,34 @@
-## 🚀 Getting Started
+## Fork, Clone, Install
 
-[<img alt="Git" src="https://img.shields.io/badge/Git-windows-%23F05032?logo=Git" />](https://gitforwindows.org)
-[<img alt="Node.js" src="https://img.shields.io/badge/Node.js-20.x-%23339933?logo=Node.js" />](https://nodejs.org)
+[Fork and Clone](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo)
 
-### 1. Clone and Install
-
-```shell
-git clone https://github.com/luisfun/discord-bot-cloudflare-ai discord-bot-cloudflare-ai
+```sh
 cd discord-bot-cloudflare-ai
 npm i
 ```
 
-### 2. Set Environment Variables
+## Setup AI Gateway
 
-Create a New Application from [Dashboard](https://discord.com/developers/applications).
+[Creat AI Gateway](https://developers.cloudflare.com/ai-gateway/get-started/creating-gateway/)
 
-#### 2.1 Set Local
+[Get ACCOUNT_ID](https://developers.cloudflare.com/fundamentals/setup/find-account-and-zone-ids/)
 
-Rename the file `example.dev.var` and create a `.dev.var` file.
+[Creat API Token](https://dash.cloudflare.com/profile/api-tokens)  
+Select template `Workers AI`
 
-Enter information in `.dev.var`, referring to the [Official Docs](https://discord.com/developers/docs/tutorials/hosting-on-cloudflare-workers).
+```shell
+npx wrangler secret put ACCOUNT_ID
+npx wrangler secret put AI_API_TOKEN
+```
 
-#### 2.2 Set Workers
+Optional: [Set Caching and Rate-limiting](https://dash.cloudflare.com/?to=/:ai/ai-gateway/settings)
+
+## Setup Discord Bot
+
+Create a New Application from [Dashboard](https://discord.com/developers/applications).  
+Copy your `APPLICATION ID`, `PUBLIC KEY` and `TOKEN`, and put them `.env` file.
+
+Storing secrets.
 
 ```shell
 npx wrangler secret put DISCORD_APPLICATION_ID
@@ -29,18 +36,15 @@ npx wrangler secret put DISCORD_PUBLIC_KEY
 npx wrangler secret put DISCORD_TOKEN
 ```
 
-### 3. Register Commands and Deploy
+Register commands and Deploy.
 
 ```shell
 npm run register
 npm run deploy
 ```
 
-### 4. Set Endpoint URL
+Enter `https://YOUER_PROJECT.YOUER_DOMAIN.workers.dev` in the [INTERACTIONS ENDPOINT URL](https://discord.com/developers/applications).
 
-Enter `https://discord-bot-cloudflare-ai.YOUER_DOMAIN.workers.dev` in the [INTERACTIONS ENDPOINT URL](https://discord.com/developers/applications).
-
-## 📑 Docs
-
-- [Discord Bot](https://discord.com/developers/docs/tutorials/hosting-on-cloudflare-workers)
-- [Cloudflare AI](https://developers.cloudflare.com/workers-ai)
+Create an invite URL from [Dashboard](https://discord.com/developers/applications).  
+`YOUR_APP` > `OAuth2` tab > `OAuth2 URL Generator` > Check SCOPES: `bot` > URL `Copy`  
+Paste the URL into the browser.
