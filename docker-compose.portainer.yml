@@ -1,0 +1,45 @@
+version: "3.9"
+
+x-logging: &x-logging
+  logging:
+    driver: "json-file"
+    options:
+      max-file: "5"
+      max-size: "10m"
+
+services:
+  discord-bot-cloudflare-ai:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: discord-bot-cloudflare-ai
+    <<: *x-logging
+    restart: unless-stopped
+
+    # Wrangler dev listens here
+    ports:
+      - "8787:8787"
+
+    # Persist "expensive" stuff so restarts are fast
+    volumes:
+      - /portainer/Files/AppData/Config/discord-bot-cloudflare-ai/node_modules:/app/node_modules
+      - /portainer/Files/AppData/Config/discord-bot-cloudflare-ai/wrangler:/app/.wrangler
+      # Optional: keep secrets outside the image
+      # Put your .dev.vars file here:
+      # /portainer/Files/AppData/Config/discord-bot-cloudflare-ai/.dev.vars
+      - /portainer/Files/AppData/Config/discord-bot-cloudflare-ai/.dev.vars:/app/.dev.vars:ro
+
+    environment:
+      NODE_ENV: development
+
+    command: >
+      sh -c "
+        if [ ! -d node_modules ] || [ -z \"$(ls -A node_modules)\" ]; then
+          npm ci --silent;
+        fi &&
+        npx wrangler dev
+        --local
+        --ip 0.0.0.0
+        --port 8787
+        --persist-to /app/.wrangler
+      "
