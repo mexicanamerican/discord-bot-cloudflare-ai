@@ -34,7 +34,9 @@ services:
 
     command: >
       sh -c "
-        npm ci --silent || true &&
+        if [ ! -d node_modules ] || [ -z \"$(ls -A node_modules)\" ]; then
+          npm ci --silent;
+        fi &&
         npx wrangler dev
         --local
         --ip 0.0.0.0
