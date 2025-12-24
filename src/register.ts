@@ -50,6 +50,10 @@ const mathModels = [
 ]
 
 const imageModels = [
+  '@cf/black-forest-labs/flux-2-dev',
+  '@cf/black-forest-labs/flux-1-schnell',
+  '@cf/leonardo/phoenix-1.0',
+  '@cf/leonardo/lucid-origin',
   '@cf/stabilityai/stable-diffusion-xl-base-1.0',
   '@cf/stabilityai/stable-diffusion-xl-lightning',
   '@cf/stabilityai/stable-diffusion-xl-turbo',
@@ -71,7 +75,7 @@ const commands = [
   new Command('text', 'AIチャット').options(...options('AIに聞く内容', 'mistral-7b-instruct-v0.1', textModels)),
   new Command('code', 'コード補助').options(...options('AIに聞く内容', 'deepseek-coder-6.7b-instruct-awq', codeModels)),
   new Command('math', '数学の解決').options(...options('AIに聞く内容', 'deepseek-math-7b-instruct', mathModels)),
-  new Command('image', '画像生成').options(...options('画像の要素', 'dreamshaper-8-lcm', imageModels)),
+  new Command('image', '画像生成').options(...options('画像の要素', 'flux-2-dev', imageModels)),
   new Command('image-genshin', '画像生成＋原神プリセット').options(
     new Option('character', 'キャラクター選択')
       .required()
@@ -83,7 +87,7 @@ const commands = [
       ),
     new Option('prompt', '追加の呪文'),
     new BooleanOption('translation', '自動翻訳（デフォルト True）'),
-    new Option('model', '選択モデル（デフォルト stable-diffusion-xl-base-1.0）').choices(
+    new Option('model', '選択モデル（デフォルト flux-2-dev）').choices(
       ...imageModels
         .map(m => ({ name: m.split('/').slice(-1)[0], value: m }))
         .sort((a, b) => a.name.localeCompare(b.name)),

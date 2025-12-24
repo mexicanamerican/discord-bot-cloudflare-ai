@@ -15,8 +15,8 @@ const defaultModel = (type: CommandKey) =>
   type === 'text' ? '@cf/mistral/mistral-7b-instruct-v0.1' :
   type === 'code' ? '@hf/thebloke/deepseek-coder-6.7b-instruct-awq' :
   type === 'math' ? '@cf/deepseek-ai/deepseek-math-7b-instruct' :
-  type === 'image' ? '@cf/lykon/dreamshaper-8-lcm' :
-  type === 'image-genshin' ? '@cf/stabilityai/stable-diffusion-xl-base-1.0' :
+  type === 'image' ? '@cf/black-forest-labs/flux-2-dev' :
+  type === 'image-genshin' ? '@cf/black-forest-labs/flux-2-dev' :
   type === 'ja2en' ? '@cf/meta/m2m100-1.2b' :
   '@cf/mistral/mistral-7b-instruct-v0.1'
 
