@@ -15,6 +15,25 @@ cd discord-bot-cloudflare-ai
 npm i
 ```
 
+## Docker Setup (Optional)
+
+You can run this bot in Docker for easy deployment and management. See [DOCKER.md](DOCKER.md) for detailed instructions.
+
+Quick start with Docker:
+```sh
+# Create your .dev.vars file first (copy from example.dev.vars)
+cp example.dev.vars .dev.vars
+# Edit .dev.vars with your Discord credentials
+
+# Start with standard Docker Compose
+docker-compose up -d
+
+# Or use the Portainer configuration
+docker-compose -f docker-compose.portainer.yml up -d
+```
+
+**Note:** Cloudflare API credentials are NOT required for local development with `wrangler dev --local`.
+
 ## Setup Workers AI
 
 This project now uses the native [Cloudflare Workers AI binding](https://developers.cloudflare.com/workers-ai/configuration/bindings/). The AI Gateway setup (ACCOUNT_ID and AI_API_TOKEN) is no longer required.
