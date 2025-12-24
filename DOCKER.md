@@ -37,10 +37,10 @@ npm run deploy       # Deploy to Workers
 Create a `.dev.vars` file in the project root with your Discord credentials:
 
 ```bash
-DISCORD_APPLICATION_ID="your_application_id"
-DISCORD_PUBLIC_KEY="your_public_key"
-DISCORD_TOKEN="your_bot_token"
-DISCORD_TEST_GUILD_ID="your_test_guild_id"
+DISCORD_APPLICATION_ID: "your_application_id"
+DISCORD_PUBLIC_KEY: "your_public_key"
+DISCORD_TOKEN: "your_bot_token"
+DISCORD_TEST_GUILD_ID: "your_test_guild_id"
 ```
 
 You can copy `example.dev.vars` as a template:
@@ -68,6 +68,8 @@ docker-compose down
 - `./.dev.vars` → `/app/.dev.vars` (read-only) - Your Discord credentials
 - `./node_modules` → `/app/node_modules` - Cached dependencies for faster restarts
 - `./.wrangler` → `/app/.wrangler` - Wrangler persistence data
+
+**Note:** The node_modules volume mapping speeds up container restarts by caching dependencies on the host. If you encounter issues with binary dependencies between different architectures (e.g., ARM Mac vs x86 Linux), you may want to use a named Docker volume instead of a host path mount.
 
 ## Using Portainer Docker Compose
 
@@ -102,6 +104,8 @@ The `docker-compose.portainer.yml` is designed for use with Portainer and uses e
 - Max 5 log files, 10MB each
 - Automatic restart unless manually stopped
 - Persistent volumes for fast container restarts
+
+**Note:** The node_modules volume mapping speeds up container restarts. If you encounter issues with binary dependencies between different architectures, you may want to use a named Docker volume instead of the host path mount.
 
 ## Port Mapping
 
