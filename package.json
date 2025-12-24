@@ -4,8 +4,8 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "fix": "biome check --apply . && tsc",
-    "fix:unsafe": "biome check --apply-unsafe . && tsc",
+    "fix": "biome check --write . && tsc",
+    "fix:unsafe": "biome check --write --unsafe . && tsc",
     "register": "tsc && node dist/register.js",
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
