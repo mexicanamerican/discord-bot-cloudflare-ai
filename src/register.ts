@@ -65,35 +65,102 @@ const imageModels = [
 
 const options = (promptDesc: string, defaultModel: string, models: string[]) => [
   new Option('prompt', promptDesc).required(),
-  new BooleanOption('translation', '自動翻訳（デフォルト True）'),
-  new Option('model', `選択モデル（デフォルト ${defaultModel}）`).choices(
+  new BooleanOption('translation', 'Auto translation (default True)'),
+  new Option('model', `Select model (default ${defaultModel})`).choices(
     ...models.map(m => ({ name: m.split('/').slice(-1)[0], value: m })).sort((a, b) => a.name.localeCompare(b.name)),
   ),
 ]
 
 const commands = [
-  new Command('text', 'AIチャット').options(...options('AIに聞く内容', 'mistral-7b-instruct-v0.1', textModels)),
-  new Command('code', 'コード補助').options(...options('AIに聞く内容', 'deepseek-coder-6.7b-instruct-awq', codeModels)),
-  new Command('math', '数学の解決').options(...options('AIに聞く内容', 'deepseek-math-7b-instruct', mathModels)),
-  new Command('image', '画像生成').options(...options('画像の要素', 'flux-2-dev', imageModels)),
-  new Command('image-genshin', '画像生成＋原神プリセット').options(
-    new Option('character', 'キャラクター選択')
+  new Command('text', 'AI Chat').options(...options('Content to ask AI', 'mistral-7b-instruct-v0.1', textModels)),
+  new Command('code', 'Code Assistance').options(
+    ...options('Content to ask AI', 'deepseek-coder-6.7b-instruct-awq', codeModels),
+  ),
+  new Command('math', 'Math Problem Solving').options(
+    ...options('Content to ask AI', 'deepseek-math-7b-instruct', mathModels),
+  ),
+  new Command('image', 'Image Generation').options(...options('Image elements', 'flux-2-dev', imageModels)),
+  new Command('image-genshin', 'Image Generation + Genshin Impact Preset').options(
+    new Option('character', 'Character selection')
       .required()
       .choices(
-        { name: '神里綾華', value: 'Kamisato Ayaka' },
-        { name: '雷電将軍', value: 'Raiden Shogun' },
-        { name: '胡桃', value: 'Hu Tao' },
-        { name: 'モナ', value: 'Mona' },
+        { name: 'Kamisato Ayaka', value: 'Kamisato Ayaka' },
+        { name: 'Raiden Shogun', value: 'Raiden Shogun' },
+        { name: 'Hu Tao', value: 'Hu Tao' },
+        { name: 'Mona', value: 'Mona' },
       ),
-    new Option('prompt', '追加の呪文'),
-    new BooleanOption('translation', '自動翻訳（デフォルト True）'),
-    new Option('model', '選択モデル（デフォルト flux-2-dev）').choices(
+    new Option('prompt', 'Additional prompt'),
+    new BooleanOption('translation', 'Auto translation (default True)'),
+    new Option('model', 'Select model (default flux-2-dev)').choices(
       ...imageModels
         .map(m => ({ name: m.split('/').slice(-1)[0], value: m }))
         .sort((a, b) => a.name.localeCompare(b.name)),
     ),
   ),
-  new Command('ja2en', '英語に翻訳').options(new Option('prompt', '翻訳する日本語').required()),
+  new Command('image-flux2dev', 'Image Generation + Flux 2 Dev Preset').options(
+    new Option('preset', 'Preset selection')
+      .required()
+      .choices({ name: 'Cinematic Portrait', value: 'Cinematic Portrait' }, { name: 'Cityscape', value: 'Cityscape' }),
+    new Option('prompt', 'Additional prompt'),
+    new BooleanOption('translation', 'Auto translation (default True)'),
+    new Option('model', 'Select model (default flux-2-dev)').choices(
+      ...imageModels
+        .map(m => ({ name: m.split('/').slice(-1)[0], value: m }))
+        .sort((a, b) => a.name.localeCompare(b.name)),
+    ),
+  ),
+  new Command('image-lucidorigin', 'Image Generation + Lucid Origin Preset').options(
+    new Option('preset', 'Preset selection')
+      .required()
+      .choices({ name: 'Graphic Design', value: 'Graphic Design' }, { name: 'HD Render', value: 'HD Render' }),
+    new Option('prompt', 'Additional prompt'),
+    new BooleanOption('translation', 'Auto translation (default True)'),
+    new Option('model', 'Select model (default lucid-origin)').choices(
+      ...imageModels
+        .map(m => ({ name: m.split('/').slice(-1)[0], value: m }))
+        .sort((a, b) => a.name.localeCompare(b.name)),
+    ),
+  ),
+  new Command('image-phoenix10', 'Image Generation + Phoenix 1.0 Preset').options(
+    new Option('preset', 'Preset selection')
+      .required()
+      .choices({ name: 'Poster', value: 'Poster' }, { name: 'Landscape', value: 'Landscape' }),
+    new Option('prompt', 'Additional prompt'),
+    new BooleanOption('translation', 'Auto translation (default True)'),
+    new Option('model', 'Select model (default phoenix-1.0)').choices(
+      ...imageModels
+        .map(m => ({ name: m.split('/').slice(-1)[0], value: m }))
+        .sort((a, b) => a.name.localeCompare(b.name)),
+    ),
+  ),
+  new Command('image-flux2realisticpeople', 'Image Generation + Flux 2 Realistic People Preset').options(
+    new Option('preset', 'Preset selection')
+      .required()
+      .choices(
+        { name: 'Business Portrait', value: 'Business Portrait' },
+        { name: 'Casual Portrait', value: 'Casual Portrait' },
+      ),
+    new Option('prompt', 'Additional prompt'),
+    new BooleanOption('translation', 'Auto translation (default True)'),
+    new Option('model', 'Select model (default flux-2-dev)').choices(
+      ...imageModels
+        .map(m => ({ name: m.split('/').slice(-1)[0], value: m }))
+        .sort((a, b) => a.name.localeCompare(b.name)),
+    ),
+  ),
+  new Command('image-flux2realisticscenes', 'Image Generation + Flux 2 Realistic Scenes Preset').options(
+    new Option('preset', 'Preset selection')
+      .required()
+      .choices({ name: 'Interior', value: 'Interior' }, { name: 'Street Night', value: 'Street Night' }),
+    new Option('prompt', 'Additional prompt'),
+    new BooleanOption('translation', 'Auto translation (default True)'),
+    new Option('model', 'Select model (default flux-2-dev)').choices(
+      ...imageModels
+        .map(m => ({ name: m.split('/').slice(-1)[0], value: m }))
+        .sort((a, b) => a.name.localeCompare(b.name)),
+    ),
+  ),
+  new Command('ja2en', 'Translate to English').options(new Option('prompt', 'Japanese text to translate').required()),
 ]
 
 register(

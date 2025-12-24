@@ -1,8 +1,25 @@
 import type { CommandContext } from 'discord-hono'
 import { Button, Components, DiscordHono } from 'discord-hono'
+import { flux2Dev } from './flux-2-dev'
+import { flux2RealisticPeople } from './flux-2-realistic-people'
+import { flux2RealisticScenes } from './flux-2-realistic-scenes'
+import { lucidOrigin } from './lucid-origin'
+import { phoenix10 } from './phoenix-1.0'
 import { sdxlGenshin } from './sdxl-genshin'
 
-type CommandKey = 'text' | 'code' | 'math' | 'image' | 'image-genshin' | 'ja2en' | (string & {})
+type CommandKey =
+  | 'text'
+  | 'code'
+  | 'math'
+  | 'image'
+  | 'image-genshin'
+  | 'image-flux2dev'
+  | 'image-lucidorigin'
+  | 'image-phoenix10'
+  | 'image-flux2realisticpeople'
+  | 'image-flux2realisticscenes'
+  | 'ja2en'
+  | (string & {})
 
 type Env = {
   Bindings: {
@@ -17,13 +34,18 @@ const defaultModel = (type: CommandKey) =>
   type === 'math' ? '@cf/deepseek-ai/deepseek-math-7b-instruct' :
   type === 'image' ? '@cf/black-forest-labs/flux-2-dev' :
   type === 'image-genshin' ? '@cf/black-forest-labs/flux-2-dev' :
+  type === 'image-flux2dev' ? '@cf/black-forest-labs/flux-2-dev' :
+  type === 'image-lucidorigin' ? '@cf/leonardo/lucid-origin' :
+  type === 'image-phoenix10' ? '@cf/leonardo/phoenix-1.0' :
+  type === 'image-flux2realisticpeople' ? '@cf/black-forest-labs/flux-2-dev' :
+  type === 'image-flux2realisticscenes' ? '@cf/black-forest-labs/flux-2-dev' :
   type === 'ja2en' ? '@cf/meta/m2m100-1.2b' :
   '@cf/mistral/mistral-7b-instruct-v0.1'
 
 const components = new Components().row(new Button('delete-self', 'Delete', 'Secondary').emoji({ name: '🗑️' }))
 
 /**
- * AIの処理 ⇒ Discordの待機中メッセージへ送信
+ * AI processing => Send to Discord waiting message
  * @param c Context
  * @param type AI type
  */
@@ -40,7 +62,18 @@ const cfai = async (c: CommandContext<Env>, type: CommandKey) => {
 
     const ai = c.env.AI
     const enPrompt = translation ? await m2m(ai, prompt, locale, 'en') : prompt
-    if (!enPrompt && type !== 'image-genshin') throw new Error('Error: Prompt Translation')
+    if (
+      !enPrompt &&
+      ![
+        'image-genshin',
+        'image-flux2dev',
+        'image-lucidorigin',
+        'image-phoenix10',
+        'image-flux2realisticpeople',
+        'image-flux2realisticscenes',
+      ].includes(type)
+    )
+      throw new Error('Error: Prompt Translation')
 
     switch (type) {
       case 'text':
@@ -59,10 +92,40 @@ const cfai = async (c: CommandContext<Env>, type: CommandKey) => {
         blobs = await Promise.all([0, 1, 2].map(async () => new Blob([await t2i(ai, model, p)])))
         break
       }
+      case 'image-flux2dev': {
+        const p = flux2Dev(values.preset?.toString(), enPrompt)
+        content = `${model.split('/').slice(-1)[0]}\`\`\`${p}\`\`\`\n`
+        blobs = await Promise.all([0, 1, 2].map(async () => new Blob([await t2i(ai, model, p)])))
+        break
+      }
+      case 'image-lucidorigin': {
+        const p = lucidOrigin(values.preset?.toString(), enPrompt)
+        content = `${model.split('/').slice(-1)[0]}\`\`\`${p}\`\`\`\n`
+        blobs = await Promise.all([0, 1, 2].map(async () => new Blob([await t2i(ai, model, p)])))
+        break
+      }
+      case 'image-phoenix10': {
+        const p = phoenix10(values.preset?.toString(), enPrompt)
+        content = `${model.split('/').slice(-1)[0]}\`\`\`${p}\`\`\`\n`
+        blobs = await Promise.all([0, 1, 2].map(async () => new Blob([await t2i(ai, model, p)])))
+        break
+      }
+      case 'image-flux2realisticpeople': {
+        const p = flux2RealisticPeople(values.preset?.toString(), enPrompt)
+        content = `${model.split('/').slice(-1)[0]}\`\`\`${p}\`\`\`\n`
+        blobs = await Promise.all([0, 1, 2].map(async () => new Blob([await t2i(ai, model, p)])))
+        break
+      }
+      case 'image-flux2realisticscenes': {
+        const p = flux2RealisticScenes(values.preset?.toString(), enPrompt)
+        content = `${model.split('/').slice(-1)[0]}\`\`\`${p}\`\`\`\n`
+        blobs = await Promise.all([0, 1, 2].map(async () => new Blob([await t2i(ai, model, p)])))
+        break
+      }
       case 'ja2en': {
         const reply1 = await m2m(ai, prompt, 'japanese', 'english')
         const reply2 = await m2m(ai, reply1, 'english', 'japanese')
-        content += `:arrow_down:    English    :arrow_down:\`\`\`${reply1}\`\`\`\n:arrow_down:    日本語    :arrow_down:\`\`\`${reply2}\`\`\``
+        content += `:arrow_down:    English    :arrow_down:\`\`\`${reply1}\`\`\`\n:arrow_down:    Japanese    :arrow_down:\`\`\`${reply2}\`\`\``
         break
       }
     }
@@ -73,7 +136,7 @@ const cfai = async (c: CommandContext<Env>, type: CommandKey) => {
         blobs.map(blob => ({ blob, name: 'image.png' })),
       )
   } catch (e) {
-    await c.followup({ content: 'AI周りでエラーが発生しました', components })
+    await c.followup({ content: 'An error occurred with AI processing', components })
     console.log(e)
   }
 }
