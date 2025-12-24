@@ -12,17 +12,15 @@
     "log": "wrangler tail"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.7.3",
-    "@cloudflare/ai": "^1.2.2",
-    "@cloudflare/workers-types": "^4.20240512.0",
+    "@biomejs/biome": "^2.3.10",
+    "@cloudflare/workers-types": "^4.20251224.0",
     "base64-js": "^1.5.1",
-    "discord-api-types": "^0.37.84",
-    "dotenv": "^16.4.5",
-    "typescript": "^5.4.5",
-    "wrangler": "^3.57.0"
+    "discord-api-types": "^0.38.37",
+    "dotenv": "^17.2.3",
+    "typescript": "^5.9.3",
+    "wrangler": "^4.56.0"
   },
   "dependencies": {
-    "@luisfun/cloudflare-ai-plugin": "^0.2.4",
-    "discord-hono": "^0.7.1"
+    "discord-hono": "^0.7.6"
   }
 }

@@ -7,28 +7,18 @@ cd discord-bot-cloudflare-ai
 npm i
 ```
 
-## Setup AI Gateway
+## Setup Workers AI
 
-[Creat AI Gateway](https://developers.cloudflare.com/ai-gateway/get-started/creating-gateway/)
+This project now uses the native [Cloudflare Workers AI binding](https://developers.cloudflare.com/workers-ai/configuration/bindings/). The AI Gateway setup (ACCOUNT_ID and AI_API_TOKEN) is no longer required.
 
-[Get ACCOUNT_ID](https://developers.cloudflare.com/fundamentals/setup/find-account-and-zone-ids/)
-
-[Creat API Token](https://dash.cloudflare.com/profile/api-tokens)  
-Select template `Workers AI`
-
-```shell
-npx wrangler secret put ACCOUNT_ID
-npx wrangler secret put AI_API_TOKEN
-```
-
-Optional: [Set Caching and Rate-limiting](https://dash.cloudflare.com/?to=/:ai/ai-gateway/settings)
+The Workers AI binding is automatically configured in `wrangler.toml` and is available as `env.AI` in the code.
 
 ## Setup Discord Bot
 
 Create a New Application from [Dashboard](https://discord.com/developers/applications).  
-Copy your `APPLICATION ID`, `PUBLIC KEY` and `TOKEN`, and put them `.env` file.
+Copy your `APPLICATION ID`, `PUBLIC KEY` and `TOKEN`, and put them in a `.dev.vars` file for local development.
 
-Storing secrets.
+Storing secrets for production:
 
 ```shell
 npx wrangler secret put DISCORD_APPLICATION_ID
@@ -36,14 +26,14 @@ npx wrangler secret put DISCORD_PUBLIC_KEY
 npx wrangler secret put DISCORD_TOKEN
 ```
 
-Register commands and Deploy.
+Register commands and Deploy:
 
 ```shell
 npm run register
 npm run deploy
 ```
 
-Enter `https://YOUER_PROJECT.YOUER_DOMAIN.workers.dev` in the [INTERACTIONS ENDPOINT URL](https://discord.com/developers/applications).
+Enter `https://YOUR_PROJECT.YOUR_DOMAIN.workers.dev` in the [INTERACTIONS ENDPOINT URL](https://discord.com/developers/applications).
 
 Create an invite URL from [Dashboard](https://discord.com/developers/applications).  
 `YOUR_APP` > `OAuth2` tab > `OAuth2 URL Generator` > Check SCOPES: `bot` > URL `Copy`  

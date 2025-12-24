@@ -1,26 +1,57 @@
-import { env } from 'node:process'
-import { modelMappings } from '@cloudflare/ai'
 import { BooleanOption, Command, Option, register } from 'discord-hono'
 import { config } from 'dotenv'
-config({ path: '.dev.vars' })
 
-const noCatalogModels = [
-  '@cf/mistral/mixtral-8x7b-instruct-v0.1-awq',
-  '@cf/deepseek-ai/deepseek-coder-7b-instruct-v1.5',
-  '@cf/nexaaidev/octopus-v2',
-  '@cf/m-a-p/opencodeinterpreter-ds-6.7b',
-  '@cf/fblgit/una-cybertron-7b-v2-bf16',
-  '@cf/sven/test',
+const envResult = config({ path: '.dev.vars' })
+const env = envResult.parsed || {}
+
+// Manual model lists based on Cloudflare Workers AI documentation
+// https://developers.cloudflare.com/workers-ai/models/
+const textModels = [
+  '@cf/meta/llama-3.3-70b-instruct-fp8-fast',
+  '@cf/meta/llama-3.2-3b-instruct',
+  '@cf/meta/llama-3.2-1b-instruct',
+  '@cf/meta/llama-3.1-70b-instruct',
+  '@cf/meta/llama-3.1-8b-instruct',
+  '@cf/meta/llama-3-8b-instruct',
+  '@cf/mistral/mistral-7b-instruct-v0.1',
+  '@cf/mistral/mistral-7b-instruct-v0.2-lora',
+  '@cf/qwen/qwen1.5-14b-chat-awq',
+  '@cf/qwen/qwen1.5-7b-chat-awq',
+  '@cf/qwen/qwen1.5-1.8b-chat',
+  '@cf/qwen/qwen1.5-0.5b-chat',
+  '@cf/google/gemma-7b-it',
+  '@cf/google/gemma-2b-it-lora',
+  '@hf/thebloke/neural-chat-7b-v3-1-awq',
+  '@hf/thebloke/openhermes-2.5-mistral-7b-awq',
+  '@hf/thebloke/zephyr-7b-beta-awq',
+  '@hf/nexusflow/starling-lm-7b-beta',
+  '@hf/nousresearch/hermes-2-pro-mistral-7b',
 ]
-const baseTextModels = modelMappings['text-generation'].models.filter(
-  m => !m.includes('-lora') && !m.includes('-base') && !noCatalogModels.includes(m),
-)
-const codeModels = baseTextModels.filter(m => m.includes('code'))
-const mathModels = baseTextModels.filter(m => m.includes('math'))
-const textModels = baseTextModels.filter(m => !codeModels.includes(m) && !mathModels.includes(m))
-const imageModels = modelMappings['text-to-image'].models.filter(
-  m => !m.includes('-img2img') && !m.includes('-inpainting'),
-)
+
+const codeModels = [
+  '@cf/deepseek-ai/deepseek-coder-6.7b-instruct-awq',
+  '@hf/thebloke/deepseek-coder-6.7b-instruct-awq',
+  '@hf/thebloke/codellama-7b-instruct-awq',
+  '@cf/deepseek-ai/deepseek-coder-7b-instruct-v1.5',
+  '@cf/qwen/qwen1.5-14b-chat-awq',
+]
+
+const mathModels = [
+  '@cf/deepseek-ai/deepseek-math-7b-instruct',
+  '@cf/deepseek-ai/deepseek-math-7b-base',
+  '@cf/meta/llama-3.1-70b-instruct',
+  '@cf/meta/llama-3.1-8b-instruct',
+]
+
+const imageModels = [
+  '@cf/stabilityai/stable-diffusion-xl-base-1.0',
+  '@cf/stabilityai/stable-diffusion-xl-lightning',
+  '@cf/stabilityai/stable-diffusion-xl-turbo',
+  '@cf/lykon/dreamshaper-8-lcm',
+  '@cf/bytedance/stable-diffusion-xl-lightning',
+  '@cf/runwayml/stable-diffusion-v1-5-img2img',
+  '@cf/runwayml/stable-diffusion-v1-5-inpainting',
+]
 
 const options = (promptDesc: string, defaultModel: string, models: string[]) => [
   new Option('prompt', promptDesc).required(),

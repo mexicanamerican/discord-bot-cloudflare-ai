@@ -1,17 +1,12 @@
-import type { ModelMappings } from '@luisfun/cloudflare-ai-plugin'
-import { Ai, gatewayUrl } from '@luisfun/cloudflare-ai-plugin'
 import type { CommandContext } from 'discord-hono'
 import { Button, Components, DiscordHono } from 'discord-hono'
 import { sdxlGenshin } from './sdxl-genshin'
 
 type CommandKey = 'text' | 'code' | 'math' | 'image' | 'image-genshin' | 'ja2en' | (string & {})
-type TextModels = ModelMappings['text-generation']['models'][number]
-type ImageModels = ModelMappings['text-to-image']['models'][number]
 
 type Env = {
   Bindings: {
-    ACCOUNT_ID: string
-    AI_API_TOKEN: string
+    AI: Ai
   }
 }
 
@@ -35,32 +30,33 @@ const components = new Components().row(new Button('delete-self', 'Delete', 'Sec
 const cfai = async (c: CommandContext<Env>, type: CommandKey) => {
   try {
     const locale = c.interaction.locale.split('-')[0]
-    const prompt = (c.values.prompt || '').toString()
-    const translation = !(locale === 'en' || c.values.translation === false)
-    const model = (c.values.model || defaultModel(type)).toString() as TextModels | ImageModels
+    // biome-ignore lint/suspicious/noExplicitAny: values is dynamically typed from Discord command options
+    const values = c.values as any
+    const prompt = (values.prompt || '').toString()
+    const translation = !(locale === 'en' || values.translation === false)
+    const model = (values.model || defaultModel(type)).toString()
     let content = `${model.split('/').slice(-1)[0]}\`\`\`${prompt}\`\`\`\n`
     let blobs: Blob[] = []
 
-    const ai = new Ai(gatewayUrl(c.env.ACCOUNT_ID, 'discord-bot'), c.env.AI_API_TOKEN)
-    const aig = new Ai(gatewayUrl(c.env.ACCOUNT_ID, 'global'), c.env.AI_API_TOKEN)
-    const enPrompt = translation ? await m2m(aig, prompt, locale, 'en') : prompt
+    const ai = c.env.AI
+    const enPrompt = translation ? await m2m(ai, prompt, locale, 'en') : prompt
     if (!enPrompt && type !== 'image-genshin') throw new Error('Error: Prompt Translation')
 
     switch (type) {
       case 'text':
       case 'code':
       case 'math': {
-        const text = (await t2t(ai, model as TextModels, enPrompt)) || ''
+        const text = (await t2t(ai, model, enPrompt)) || ''
         content += translation ? await m2m(ai, text, 'en', locale) : text
         break
       }
       case 'image':
-        blobs = await Promise.all([0, 1, 2].map(async () => new Blob([await t2i(ai, model as ImageModels, enPrompt)])))
+        blobs = await Promise.all([0, 1, 2].map(async () => new Blob([await t2i(ai, model, enPrompt)])))
         break
       case 'image-genshin': {
-        const p = sdxlGenshin(c.values.character?.toString(), enPrompt)
+        const p = sdxlGenshin(values.character?.toString(), enPrompt)
         content = `${model.split('/').slice(-1)[0]}\`\`\`${p}\`\`\`\n`
-        blobs = await Promise.all([0, 1, 2].map(async () => new Blob([await t2i(ai, model as ImageModels, p)])))
+        blobs = await Promise.all([0, 1, 2].map(async () => new Blob([await t2i(ai, model, p)])))
         break
       }
       case 'ja2en': {
@@ -83,17 +79,21 @@ const cfai = async (c: CommandContext<Env>, type: CommandKey) => {
 }
 
 // ai core
-const t2t = async (ai: Ai, model: TextModels, prompt: string) =>
-  ((await ai.run(model, { prompt })) as { response: string }).response
+const t2t = async (ai: Ai, model: string, prompt: string) =>
+  // biome-ignore lint/suspicious/noExplicitAny: AI model parameter needs dynamic typing
+  ((await ai.run(model as any, { prompt })) as { response: string }).response
 const m2m = async (ai: Ai, text: string, source_lang: string, target_lang: string) =>
-  (await ai.mdt('@cf/meta/m2m100-1.2b', { text, source_lang, target_lang })).translated_text
-const t2i = async (ai: Ai, model: ImageModels, prompt: string) => {
+  // biome-ignore lint/suspicious/noExplicitAny: AI model parameter needs dynamic typing
+  ((await ai.run('@cf/meta/m2m100-1.2b' as any, { text, source_lang, target_lang })) as { translated_text: string })
+    .translated_text
+const t2i = async (ai: Ai, model: string, prompt: string) => {
   // biome-ignore format: ternary operator
   const num_steps =
     (model === '@cf/bytedance/stable-diffusion-xl-lightning' || model === '@cf/stabilityai/stable-diffusion-xl-turbo') ? 1 :
     model === '@cf/lykon/dreamshaper-8-lcm' ? 8 :
     20
-  return await ai.run(model, { prompt, num_steps }, { 'cf-cache-ttl': 60, 'cf-skip-cache': true })
+  // biome-ignore lint/suspicious/noExplicitAny: AI model parameter needs dynamic typing
+  return (await ai.run(model as any, { prompt, num_steps })) as ArrayBuffer
 }
 
 export default new DiscordHono<Env>()
