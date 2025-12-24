@@ -150,10 +150,15 @@ const m2m = async (ai: Ai, text: string, source_lang: string, target_lang: strin
   ((await ai.run('@cf/meta/m2m100-1.2b' as any, { text, source_lang, target_lang })) as { translated_text: string })
     .translated_text
 const t2i = async (ai: Ai, model: string, prompt: string) => {
+  if (model === '@cf/black-forest-labs/flux-2-dev') {
+    // flux-2-dev uses 'steps' parameter instead of 'num_steps'
+    // biome-ignore lint/suspicious/noExplicitAny: AI model parameter needs dynamic typing
+    return (await ai.run(model as any, { prompt, steps: 25 })) as ArrayBuffer
+  }
   // biome-ignore format: ternary operator
   const num_steps =
-    (model === '@cf/bytedance/stable-diffusion-xl-lightning' || model === '@cf/stabilityai/stable-diffusion-xl-turbo') ? 1 :
-    model === '@cf/lykon/dreamshaper-8-lcm' ? 8 :
+    model === '@cf/leonardo/lucid-origin' ? 20 :
+    model === '@cf/leonardo/phoenix-1.0' ? 25 :
     20
   // biome-ignore lint/suspicious/noExplicitAny: AI model parameter needs dynamic typing
   return (await ai.run(model as any, { prompt, num_steps })) as ArrayBuffer
