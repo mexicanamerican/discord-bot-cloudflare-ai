@@ -1,3 +1,11 @@
+## Quick Deploy
+
+Deploy this Discord bot to Cloudflare Workers with one click:
+
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/mexicanamerican/discord-bot-cloudflare-ai)
+
+After deployment, you'll need to configure your Discord bot credentials as secrets (see [Setup Discord Bot](#setup-discord-bot) section below).
+
 ## Fork, Clone, Install
 
 [Fork and Clone](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo)
