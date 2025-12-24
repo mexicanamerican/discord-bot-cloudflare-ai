@@ -4,6 +4,13 @@ import { config } from 'dotenv'
 const envResult = config({ path: '.dev.vars' })
 const env = envResult.parsed || {}
 
+if (!env.DISCORD_APPLICATION_ID || !env.DISCORD_TOKEN) {
+  throw new Error(
+    'Missing required environment variables DISCORD_APPLICATION_ID and/or DISCORD_TOKEN. ' +
+      'Please create a .dev.vars file with these values for local development.',
+  )
+}
+
 // Manual model lists based on Cloudflare Workers AI documentation
 // https://developers.cloudflare.com/workers-ai/models/
 const textModels = [
@@ -33,7 +40,6 @@ const codeModels = [
   '@hf/thebloke/deepseek-coder-6.7b-instruct-awq',
   '@hf/thebloke/codellama-7b-instruct-awq',
   '@cf/deepseek-ai/deepseek-coder-7b-instruct-v1.5',
-  '@cf/qwen/qwen1.5-14b-chat-awq',
 ]
 
 const mathModels = [
